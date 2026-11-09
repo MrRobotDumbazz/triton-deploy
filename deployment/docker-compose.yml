@@ -1,0 +1,56 @@
+# Стек triton-deploy: triton + prometheus + grafana (зона deployment/, W-2).
+# Запуск: bash deployment/run_triton.sh  (или docker compose -f deployment/docker-compose.yml up -d)
+# Пути томов относительны этому файлу (deployment/): ../ — корень репо.
+# CPU-only (I54): GPU-ускорители не требуются и не обещаются; бэкенд Triton — onnxruntime.
+
+services:
+  triton:
+    build:
+      context: ..
+      dockerfile: deployment/docker/Dockerfile
+    container_name: triton
+    ports:
+      - "8000:8000"   # HTTP  (REST /v2/...)
+      - "8001:8001"   # gRPC
+      - "8002:8002"   # метрики Prometheus (/metrics)
+    # Команду задаёт compose (в образе ENTRYPOINT отсутствует, есть только CMD-дефолт).
+    command: tritonserver --model-repository=/models --http-port=8000 --grpc-port=8001 --metrics-port=8002
+    networks:
+      - triton-net
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.53.1
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+    command: --config.file=/etc/prometheus/prometheus.yml --web.enable-lifecycle
+    networks:
+      - triton-net
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../monitoring/grafana-dashboard.json:/var/lib/grafana/dashboards/triton-deploy.json:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - triton-net
+
+volumes:
+  grafana-data:
+
+networks:
+  triton-net:
+    driver: bridge

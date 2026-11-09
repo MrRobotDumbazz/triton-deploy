@@ -1,0 +1,13 @@
+# Grafana provisioning: провайдер дашбордов (зона deployment/, W-2).
+# Дашборд triton-deploy.json монтируется compose-ом в /var/lib/grafana/dashboards/.
+apiVersion: 1
+
+providers:
+  - name: default
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    options:
+      path: /var/lib/grafana/dashboards
