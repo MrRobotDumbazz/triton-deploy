@@ -1,0 +1,32 @@
+name: "resnet50"
+platform: "onnxruntime_onnx"
+max_batch_size: 32
+version_policy { latest { num_versions: 2 } }
+
+input [
+  {
+    name: "input"
+    data_type: TYPE_FP32
+    dims: [3, 224, 224]
+  }
+]
+
+output [
+  {
+    name: "probs"
+    data_type: TYPE_FP32
+    dims: [1000]
+  },
+  {
+    name: "preds"
+    data_type: TYPE_INT64
+    dims: [1]
+  }
+]
+
+dynamic_batching {
+  preferred_batch_size: [4, 8]
+  max_queue_delay_microseconds: 2000
+}
+
+instance_group [{ count: 1, kind: KIND_CPU }]
