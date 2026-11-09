@@ -1,0 +1,36 @@
+# Эталон дерева сабмита (I51/C10) — triton-deploy
+# Источник: .spec/task.md → «Submission Structure» (снапшот на Genesis, 2026-11-09).
+# Проверка: bash .ztacp/check-tree.sh (продуктовое дерево vs REQUIRED; extras сверяются с SANCTIONED).
+# Отклонение без строки в SANCTIONED = архитектурный дрейф (П3).
+
+## REQUIRED (обязательные — из задания)
+models/resnet50/
+models/yolov5/
+deployment/docker/Dockerfile
+deployment/run_triton.sh
+monitoring/prometheus.yml
+monitoring/grafana-dashboard.json
+client/inference_client.py
+client/samples/
+requirements.txt
+README.md
+
+## SANCTIONED EXTRAS (разрешено заданием — прямые требования секций, не фантазия)
+models/resnet50/config.pbtxt          # Model Serving: «features such as dynamic batching» — конфиг обязателен
+models/resnet50/1/model.onnx          # Scalability & Versioning: версии = нумерованные подкаталоги Triton
+models/resnet50/2/model.onnx          #   v1 = fp32 (baseline), v2 = оптимизированная (Performance Optimization)
+models/yolov5/config.pbtxt
+models/yolov5/1/model.onnx
+monitoring/alerts.yml                 # Bonus: «Add alerting rules in Prometheus»
+client/benchmark.py                   # Performance Optimization: «Benchmark inference before and after»
+client/imagenet_classes.txt           # Code Quality: чистый вывод клиента (топ-5 имён классов)
+deployment/docker-compose.yml         # Monitoring: связка triton+prometheus+grafana — один запуск
+deployment/grafana/                   # Grafana provisioning (datasource + dashboard provider)
+client/samples/img_01.jpg … img_10.jpg  # Dataset: «at least 10 sample images»
+client/benchmark_results.md           # отчёт before/after (реальные прогоны, I54 — источник указан)
+.env.example                          # задание: «.env (optional)» — пример без секретов
+
+## RUNTIME (не коммитится — .gitignore)
+client/inference_log.csv              # Bonus: «Export inference logs to CSV» — вывод рантайма
+
+# Имена моделей: resnet50 (задание фиксирует), yolov5 (задание фиксирует yolov5/; внутри — yolov5s).

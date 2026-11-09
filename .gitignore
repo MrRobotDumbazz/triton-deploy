@@ -1,0 +1,19 @@
+# Задание (приватный источник эталона — не входит в сдачу)
+triton-deploy*.md
+
+# Runtime-артефакты клиента (бонус CSV-лог — вывод, не код)
+client/inference_log.csv
+client/inference_log_*.csv
+
+# Python
+__pycache__/
+*.py[cod]
+.venv*/
+venv/
+
+# Секреты (карантин кред I52)
+.env
+
+# Служебные
+.DS_Store
+*.log
