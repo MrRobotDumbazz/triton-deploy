@@ -1,0 +1,33 @@
+# Alerting rules Prometheus — зона: monitoring/ (W-3). Контракт: .spec/contracts/ports.md v1.0.
+# Монтируется в контейнер Prometheus как /etc/prometheus/alerts.yml
+# (путь объявлен в monitoring/prometheus.yml; монтирование — зона W-2, deployment/docker-compose.yml).
+#
+# E8 (сверка обязательна): имена метрик Triton зависят от версии образа
+# (23.12 — канонические *_sum/_count), сверка по живому /metrics на интеграции ОБЯЗАТЕЛЬНА.
+# Особо проверить: семейства nv_inference_request_success / nv_inference_request_failure
+# в стоковом Triton — простые счётчики (без суффиксов _sum/_count): если живой /metrics
+# не отдаёт *_sum для них — убрать суффикс "_sum" в expr ниже и в grafana-dashboard.json
+# (панели 1, 4, 5, 6). Гистограммные семейства (*_duration_us) суффиксы имеют.
+# Среда CPU-only (ports.md, I54 громко): GPU/DCGM-метрики не обещаны и здесь не используются.
+
+groups:
+  - name: triton-alerts
+    rules:
+      # Средняя задержка запроса (мкс/запрос) > 100000 мкс = 100 мс
+      - alert: HighInferenceLatency
+        expr: "rate(nv_inference_request_duration_us_sum[5m]) / rate(nv_inference_request_duration_us_count[5m]) > 100000"
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Triton: средняя задержка инференса > 100 мс"
+          description: "Средняя задержка запроса {{ $value }} мкс превышает порог 100000 мкс (100 мс) уже более 5 минут. Среда CPU-only: проверить конкурирующую нагрузку и бэкенд модели."
+      # Появление ошибочных запросов (частота отказов > 0)
+      - alert: FailedRequests
+        expr: "rate(nv_inference_request_failure_sum[5m]) > 0"
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Triton: ошибочные запросы инференса"
+          description: "Частота ошибочных запросов {{ $value }} req/s держится выше нуля более 2 минут. Проверить логи Triton и контракт моделей .spec/contracts/model-io.md."
