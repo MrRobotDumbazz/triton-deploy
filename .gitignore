@@ -17,3 +17,5 @@ venv/
 # Служебные
 .DS_Store
 *.log
+# ... кроме append-only памяти ZTACP (I21/I6 — версионируется)
+!.ztacp/*.log
