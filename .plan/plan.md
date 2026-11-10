@@ -13,8 +13,8 @@
 - [x] **Этап 6 — S-1 общие файлы.** `1c6b1ea`: README, requirements, .env.example. Паритет дерева: OK.
 - [x] **Этап 7 — Интеграция.** Стек up (triton healthy, prometheus, grafana); смоук обеих моделей; живое демо load/unload + версионных URL; бенчмарк before/after реальные числа (int8 ~1.7–1.9×); CSV-лог; имена метрик сверены с /metrics (2 исправления W-3); fix клиента (--images, served version). Коммиты: `0c2adb6, 7c8f618, 24df2f3, dc6736c, b7fbb86`.
 - [x] **Этап 8 — Паритет и аудит.** `check-tree.sh` → OK; чек-лист аудита прогнан живьём (см. журнал); README синхронизирован с фактами (2 правки из живых находок: POST index, explicit model control). Коммит: `audit: ...`
-- [ ] **Этап 9 — T-final (I53).** `bash .agents/bin/sterile-branch.sh submit main` → стерильность-скан. Main не стирается.
-- [ ] **Этап 10 — Хост (I56, override P-1).** GitHub-репо создано по прямому приказу P-1 (D2, фикс в `.ztacp/overrides.log`), пуш main + submit.
+- [x] **Этап 9 — T-final (I53).** `submit` собрана (14 коммитов, стерильность-скан чист, ролевые следы сняты из сообщений, история органичная). Main не стёрт.
+- [ ] **Этап 10 — Хост (I56, override P-1).** GitHub-репо `MrRobotDumbazz/triton-deploy`, **public** (решение P-1 от 2026-11-10). Блокер: `gh auth` невалиден — refresh (`gh auth refresh -h github.com`) — акт P-1. После: gh repo create → remote github → push main + submit.
 
 ## Журнал приёма этапов
 
@@ -38,3 +38,5 @@
 - Monitoring: Prometheus scrape triton:8002 up ✓; дашборд Grafana провижен ✓; алерты bonus: HighInferenceLatency **firing** (стенд реально >100 мс), FailedRequests inactive ✓
 - Versioning: latest{2} + versions/<v>/infer + hot load/unload (explicit) — продемонстрировано ✓
 - Bonus: alerting rules ✓; inference logs → CSV ✓
+
+| 9 | 2026-11-10 | submit f479cbc→ | OK | стерильная ветка: 14 коммитов, скан чист, сообщения органичные |
