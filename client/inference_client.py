@@ -347,16 +347,24 @@ def ensure_server_live(client: httpclient.InferenceServerClient, url: str) -> No
         sys.exit(1)
 
 
+def _served_version(result) -> str:
+    """Версия, которую обслужил сервер (из метаданных ответа v2)."""
+    try:
+        return str(result.get_response().get("model_version", "") or "")
+    except Exception:
+        return ""
+
+
 def infer_resnet50(
     client: httpclient.InferenceServerClient,
     batch: np.ndarray,
     model_version: str = "",
-) -> tuple[np.ndarray, np.ndarray, float]:
+) -> tuple[np.ndarray, np.ndarray, float, str]:
     """Запрос resnet50: input [N,3,224,224] → probs [N,1000], preds [N,1].
 
     Returns
     -------
-    (probs, preds, latency_ms) — латентность по клиентским часам.
+    (probs, preds, latency_ms, served_version) — латентность по клиентским часам.
     """
     inp = httpclient.InferInput("input", batch.shape, "FP32")
     inp.set_data_from_numpy(batch, binary_data=True)
@@ -369,19 +377,20 @@ def infer_resnet50(
         "resnet50", inputs=[inp], outputs=outputs, model_version=model_version
     )
     latency_ms = (time.perf_counter() - t0) * 1000.0
-    return result.as_numpy("probs"), result.as_numpy("preds"), latency_ms
+    return (result.as_numpy("probs"), result.as_numpy("preds"), latency_ms,
+            _served_version(result))
 
 
 def infer_yolov5(
     client: httpclient.InferenceServerClient,
     batch: np.ndarray,
     model_version: str = "",
-) -> tuple[np.ndarray, float]:
+) -> tuple[np.ndarray, float, str]:
     """Запрос yolov5: images [N,3,640,640] → output0 [N,25200,85].
 
     Returns
     -------
-    (output0, latency_ms).
+    (output0, latency_ms, served_version).
     """
     inp = httpclient.InferInput("images", batch.shape, "FP32")
     inp.set_data_from_numpy(batch, binary_data=True)
@@ -391,7 +400,7 @@ def infer_yolov5(
         "yolov5", inputs=[inp], outputs=outputs, model_version=model_version
     )
     latency_ms = (time.perf_counter() - t0) * 1000.0
-    return result.as_numpy("output0"), latency_ms
+    return result.as_numpy("output0"), latency_ms, _served_version(result)
 
 
 # ---------------------------------------------------------------------------
@@ -502,6 +511,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
              f"по умолчанию {DEFAULT_SAMPLES_DIR}",
     )
     parser.add_argument(
+        "--images", dest="images_flag", nargs="+", default=None,
+        help="то же, что позиционные аргументы (для совместимости с README)",
+    )
+    parser.add_argument(
         "--url", default=os.environ.get("TRITON_URL", "localhost:8000"),
         help="URL Triton HTTP (env TRITON_URL, по умолчанию localhost:8000)",
     )
@@ -546,7 +559,7 @@ def run_resnet50(args, client: httpclient.InferenceServerClient,
         chunk = images[start:start + batch_size]
         batch = np.stack([tensors[p] for p in chunk])
         try:
-            probs, preds, latency_ms = infer_resnet50(
+            probs, preds, latency_ms, served = infer_resnet50(
                 client, batch, model_version=args.version)
             per_image = postprocess_resnet50(probs, preds, labels,
                                              k=args.topk)
@@ -562,11 +575,12 @@ def run_resnet50(args, client: httpclient.InferenceServerClient,
                     prediction_summary=f"error: {exc}")
             continue
         for path, topk in zip(chunk, per_image):
-            _print_resnet50(path.name, args.version, latency_ms, topk,
-                            batch=len(chunk))
+            _print_resnet50(path.name, served or args.version, latency_ms,
+                            topk, batch=len(chunk))
             if not args.no_log:
                 append_inference_csv(
-                    args.log_csv, model="resnet50", version=args.version,
+                    args.log_csv, model="resnet50",
+                    version=served or args.version,
                     image=path.name, batch=len(chunk),
                     latency_ms=latency_ms / len(chunk), ok=True,
                     prediction_summary=_summary_resnet50(topk))
@@ -579,7 +593,7 @@ def run_yolov5(args, client: httpclient.InferenceServerClient,
         orig_shape = img.shape[:2]
         batch = np.stack([preprocess_yolov5(img)])
         try:
-            output0, latency_ms = infer_yolov5(
+            output0, latency_ms, served = infer_yolov5(
                 client, batch, model_version=args.version)
             detections = postprocess_yolov5(
                 output0, conf=args.conf, iou=args.iou,
@@ -593,10 +607,11 @@ def run_yolov5(args, client: httpclient.InferenceServerClient,
                     image=path.name, batch=1, latency_ms=0.0, ok=False,
                     prediction_summary=f"error: {exc}")
             continue
-        _print_yolov5(path.name, args.version, latency_ms, detections)
+        _print_yolov5(path.name, served or args.version, latency_ms,
+                      detections)
         if not args.no_log:
             append_inference_csv(
-                args.log_csv, model="yolov5", version=args.version,
+                args.log_csv, model="yolov5", version=served or args.version,
                 image=path.name, batch=1, latency_ms=latency_ms, ok=True,
                 prediction_summary=_summary_yolov5(detections))
 
@@ -609,7 +624,8 @@ def main(argv: list[str] | None = None) -> int:
               file=sys.stderr)
         return 2
 
-    paths = args.images if args.images else [DEFAULT_SAMPLES_DIR]
+    paths = args.images_flag + args.images if args.images_flag else (
+        args.images if args.images else [DEFAULT_SAMPLES_DIR])
     images = collect_images(paths)
     if not images:
         print(f"ОШИБКА: изображения не найдены ({' '.join(map(str, paths))})",

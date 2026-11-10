@@ -112,8 +112,8 @@ def run_config(client, model: str, version: int, batch: int,
         latencies: list[float] = []
         t_start = time.perf_counter()
         for _ in range(iters):
-            _, _, latency_ms = infer(client, batch_input,
-                                     model_version=version_str)
+            out = infer(client, batch_input, model_version=version_str)
+            latency_ms = out[-2]  # (…, latency_ms, served_version)
             latencies.append(latency_ms)
         total_s = time.perf_counter() - t_start
     except Exception as exc:
@@ -135,11 +135,32 @@ def run_config(client, model: str, version: int, batch: int,
     }
 
 
+def merge_results(json_path: Path, meta: dict,
+                  results: list[dict]) -> list[dict]:
+    """Слияние с прошлыми прогонами: результаты той же модели заменяются,
+    остальных моделей — сохраняются (отчёт общий на все модели)."""
+    all_results = list(results)
+    if json_path.exists():
+        try:
+            prev = json.loads(json_path.read_text(encoding="utf-8"))
+            keep = [r for r in prev.get("results", [])
+                    if r.get("model") != meta["model"]]
+            all_results = keep + all_results
+        except Exception as exc:
+            print(f"[bench] ПРЕДУПРЕЖДЕНИЕ: не прочитан прошлый {json_path} "
+                  f"({exc}) — отчёт только за текущий прогон", file=sys.stderr)
+    order = {"resnet50": 0, "yolov5": 1}
+    return sorted(all_results,
+                  key=lambda r: (order.get(r.get("model"), 9),
+                                 r.get("version", 0), r.get("batch", 0)))
+
+
 def write_markdown(path: Path, meta: dict, results: list[dict]) -> None:
     """Markdown-отчёт: шапка + таблица (модель, версия, batch, avg/p50/p95,
     req/s); упавшие конфигурации помечаются ERROR без чисел."""
+    models = sorted({r["model"] for r in results})
     lines = [
-        f"# Benchmark: triton-deploy — {meta['model']} (before/after)",
+        f"# Benchmark: triton-deploy — {', '.join(models)} (before/after)",
         "",
         f"- Дата (UTC): {meta['date_utc']}",
         f"- CPU: {meta['cpu']} ({meta['ncpu']} ядер)",
@@ -147,8 +168,9 @@ def write_markdown(path: Path, meta: dict, results: list[dict]) -> None:
         f"{meta['url']}",
         f"- Клиент: tritonclient[http], бинарная передача; латентность — "
         f"клиентские часы per request",
-        f"- Примечание: before = v1 (fp32), after = v2 (int8); "
-        f"warmup={meta['warmup']}, итераций={meta['iters_default']}",
+        f"- Примечание: before = v1 (fp32), after = v2 (int8) для resnet50; "
+        f"yolov5 — v1 fp32. warmup={meta['warmup']}, "
+        f"итераций (последний прогон, {meta['model']})={meta['iters_default']}",
         "",
         "| модель | версия | batch | avg, мс | p50, мс | p95, мс | req/s |",
         "|---|---|---|---|---|---|---|",
@@ -288,8 +310,9 @@ def main(argv: list[str] | None = None) -> int:
         "iters_default": iters,
         "images": [p.name for p in images],
     }
-    write_markdown(Path(args.out_md), meta, results)
-    write_json(Path(args.out_json), meta, results)
+    merged = merge_results(Path(args.out_json), meta, results)
+    write_markdown(Path(args.out_md), meta, merged)
+    write_json(Path(args.out_json), meta, merged)
     print(f"Отчёты: {args.out_md}, {args.out_json}", file=sys.stderr)
     return 0 if all(r["status"] == "ok" for r in results) else 3
 
