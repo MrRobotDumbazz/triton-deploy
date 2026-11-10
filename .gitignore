@@ -1,21 +1,16 @@
-# Задание (приватный источник эталона — не входит в сдачу)
-triton-deploy*.md
-
-# Runtime-артефакты клиента (бонус CSV-лог — вывод, не код)
-client/inference_log.csv
-client/inference_log_*.csv
-
 # Python
 __pycache__/
 *.py[cod]
 .venv*/
 venv/
 
-# Секреты (карантин кред I52)
+# Runtime-артефакты клиента (лог инференса — вывод, не код)
+client/inference_log.csv
+client/inference_log_*.csv
+
+# Секреты
 .env
 
-# Служебные
+# Служебное
 .DS_Store
 *.log
-# ... кроме append-only памяти ZTACP (I21/I6 — версионируется)
-!.ztacp/*.log
