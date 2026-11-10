@@ -65,7 +65,7 @@ cmd_up() {
     wait_triton_ready
     echo
     echo "=== Модели в репозитории Triton (/v2/repository/index) ==="
-    if curl -s http://localhost:8000/v2/repository/index | python3 -m json.tool; then
+    if curl -s -X POST http://localhost:8000/v2/repository/index | python3 -m json.tool; then
         :
     else
         echo "ВНИМАНИЕ (I54): список моделей получить не удалось — сервер не ответил на /v2/repository/index." >&2
