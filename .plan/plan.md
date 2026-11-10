@@ -11,8 +11,8 @@
 - [x] **Этап 4 — W-3 monitoring.** `b718df5`: prometheus, alerts (бонус), dashboard 6 панелей. Громко: имена nv_inference_* сверить с живым /metrics на интеграции.
 - [x] **Этап 5 — W-4 client.** `ad88dcf`: клиент+bенчмарк+labels+10 samples; мок-тесты E2E изолированы в /tmp и удалены.
 - [x] **Этап 6 — S-1 общие файлы.** `1c6b1ea`: README, requirements, .env.example. Паритет дерева: OK.
-- [ ] **Этап 7 — Интеграция.** Docker stack up, смоук-инференс обеих моделей, benchmark before/after (реальные числа), CSV-лог. Громкий фолбэк (I54), если среда не тянет. Коммит `bench: ...`
-- [ ] **Этап 8 — Паритет и аудит.** `bash .ztacp/check-tree.sh`; прогон чек-пунктов аудита из `.spec/task.md`; README синхронизирован. Коммит `audit: ...`
+- [x] **Этап 7 — Интеграция.** Стек up (triton healthy, prometheus, grafana); смоук обеих моделей; живое демо load/unload + версионных URL; бенчмарк before/after реальные числа (int8 ~1.7–1.9×); CSV-лог; имена метрик сверены с /metrics (2 исправления W-3); fix клиента (--images, served version). Коммиты: `0c2adb6, 7c8f618, 24df2f3, dc6736c, b7fbb86`.
+- [x] **Этап 8 — Паритет и аудит.** `check-tree.sh` → OK; чек-лист аудита прогнан живьём (см. журнал); README синхронизирован с фактами (2 правки из живых находок: POST index, explicit model control). Коммит: `audit: ...`
 - [ ] **Этап 9 — T-final (I53).** `bash .agents/bin/sterile-branch.sh submit main` → стерильность-скан. Main не стирается.
 - [ ] **Этап 10 — Хост (I56, override P-1).** GitHub-репо создано по прямому приказу P-1 (D2, фикс в `.ztacp/overrides.log`), пуш main + submit.
 
@@ -26,3 +26,15 @@
 | 4 | 2026-11-09 | b718df5 | OK (monitoring) | W-3; метрики к живой сверке |
 | 5 | 2026-11-09 | ad88dcf | OK (client) | W-4 |
 | 6 | 2026-11-09 | 1c6b1ea | **OK (всё дерево)** | S-1: README/requirements/.env.example |
+| 7 | 2026-11-10 | 0c2adb6…b7fbb86 | OK | v2 → static QDQ (dynamic не грузился); метрики сверены; бенчмарк реальные числа; демо versioning живьём |
+| 8 | 2026-11-10 | audit | **OK** | чек-лист аудита прогнан: Triton в Docker ✓, 2 модели ✓, REST+gRPC ✓, dynamic batching ✓, клиент ✓, ONNX-оптимизация+бенчмарк ✓, воспроизводимость ✓, Prometheus ✓, Grafana ✓, логи CSV ✓, версии+reload ✓, модульность ✓; бонус: алерты ✓ (firing на стенде), CSV ✓ |
+
+## Аудит-чеклист (живой прогон 2026-11-10)
+
+- Setup: README полный ✓; requirements.txt ✓; все файлы на месте ✓ (check-tree OK)
+- Model Serving: Triton в Docker (healthy) ✓; resnet50 (2 версии) + yolov5 READY ✓; REST 8000 + gRPC 8001 ✓; dynamic batching в config.pbtxt ✓; клиент шлёт/получает ✓
+- Performance Optimization: v2 int8 (static QDQ) ✓; бенчмарк до/после с p50/p95/req/s ✓; интерпретация в README ✓ (включая честный провал dynamic-quant)
+- DevOps: Dockerfile + docker-compose + run_triton.sh ✓
+- Monitoring: Prometheus scrape triton:8002 up ✓; дашборд Grafana провижен ✓; алерты bonus: HighInferenceLatency **firing** (стенд реально >100 мс), FailedRequests inactive ✓
+- Versioning: latest{2} + versions/<v>/infer + hot load/unload (explicit) — продемонстрировано ✓
+- Bonus: alerting rules ✓; inference logs → CSV ✓

@@ -28,6 +28,7 @@ deployment/docker-compose.yml         # Monitoring: связка triton+promethe
 deployment/grafana/                   # Grafana provisioning (datasource + dashboard provider)
 client/samples/img_01.jpg … img_10.jpg  # Dataset: «at least 10 sample images»
 client/benchmark_results.md           # отчёт before/after (реальные прогоны, I54 — источник указан)
+client/benchmark_results.json         # машиночитаемый двойник отчёта
 .env.example                          # задание: «.env (optional)» — пример без секретов
 
 ## RUNTIME (не коммитится — .gitignore)
