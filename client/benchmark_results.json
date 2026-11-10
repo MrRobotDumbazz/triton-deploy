@@ -1,0 +1,186 @@
+{
+  "meta": {
+    "date_utc": "2026-11-10 04:05:34",
+    "model": "yolov5",
+    "cpu": "AMD Ryzen 7 7730U with Radeon Graphics",
+    "ncpu": 16,
+    "triton_image": "nvcr.io/nvidia/tritonserver:23.12-py3 (образ из контракта B1)",
+    "server_version": "2.41.0",
+    "url": "localhost:8000",
+    "warmup": 5,
+    "iters_default": 20,
+    "images": [
+      "img_01.jpg"
+    ]
+  },
+  "results": [
+    {
+      "model": "resnet50",
+      "version": 1,
+      "batch": 1,
+      "iters": 50,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 63.309,
+      "p50_ms": 56.647,
+      "p95_ms": 96.091,
+      "rps": 15.74
+    },
+    {
+      "model": "resnet50",
+      "version": 1,
+      "batch": 2,
+      "iters": 50,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 105.505,
+      "p50_ms": 102.988,
+      "p95_ms": 147.406,
+      "rps": 9.45
+    },
+    {
+      "model": "resnet50",
+      "version": 1,
+      "batch": 4,
+      "iters": 50,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 147.56,
+      "p50_ms": 142.377,
+      "p95_ms": 177.813,
+      "rps": 6.76
+    },
+    {
+      "model": "resnet50",
+      "version": 1,
+      "batch": 8,
+      "iters": 50,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 286.063,
+      "p50_ms": 281.886,
+      "p95_ms": 328.004,
+      "rps": 3.49
+    },
+    {
+      "model": "resnet50",
+      "version": 1,
+      "batch": 16,
+      "iters": 50,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 565.201,
+      "p50_ms": 562.766,
+      "p95_ms": 595.758,
+      "rps": 1.76
+    },
+    {
+      "model": "resnet50",
+      "version": 2,
+      "batch": 1,
+      "iters": 50,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 32.594,
+      "p50_ms": 28.834,
+      "p95_ms": 53.961,
+      "rps": 30.53
+    },
+    {
+      "model": "resnet50",
+      "version": 2,
+      "batch": 2,
+      "iters": 50,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 61.884,
+      "p50_ms": 56.924,
+      "p95_ms": 84.888,
+      "rps": 16.09
+    },
+    {
+      "model": "resnet50",
+      "version": 2,
+      "batch": 4,
+      "iters": 50,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 102.377,
+      "p50_ms": 99.961,
+      "p95_ms": 128.624,
+      "rps": 9.72
+    },
+    {
+      "model": "resnet50",
+      "version": 2,
+      "batch": 8,
+      "iters": 50,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 193.265,
+      "p50_ms": 188.541,
+      "p95_ms": 233.346,
+      "rps": 5.14
+    },
+    {
+      "model": "resnet50",
+      "version": 2,
+      "batch": 16,
+      "iters": 50,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 350.289,
+      "p50_ms": 349.774,
+      "p95_ms": 375.851,
+      "rps": 2.84
+    },
+    {
+      "model": "yolov5",
+      "version": 1,
+      "batch": 1,
+      "iters": 20,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 304.248,
+      "p50_ms": 298.354,
+      "p95_ms": 337.262,
+      "rps": 3.27
+    },
+    {
+      "model": "yolov5",
+      "version": 1,
+      "batch": 2,
+      "iters": 20,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 584.803,
+      "p50_ms": 583.823,
+      "p95_ms": 611.902,
+      "rps": 1.71
+    },
+    {
+      "model": "yolov5",
+      "version": 1,
+      "batch": 4,
+      "iters": 20,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 1231.355,
+      "p50_ms": 1231.998,
+      "p95_ms": 1267.79,
+      "rps": 0.81
+    },
+    {
+      "model": "yolov5",
+      "version": 1,
+      "batch": 8,
+      "iters": 20,
+      "warmup": 5,
+      "status": "ok",
+      "avg_ms": 2613.437,
+      "p50_ms": 2619.893,
+      "p95_ms": 2656.128,
+      "rps": 0.38
+    }
+  ]
+}
