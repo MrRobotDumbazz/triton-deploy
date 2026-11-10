@@ -1,7 +1,7 @@
-# Prometheus — конфиг scrape/eval. Зона: monitoring/ (W-3).
-# Контракт: .spec/contracts/ports.md v1.0 — Triton metrics :8002 (/metrics),
+# Prometheus — конфиг scrape/eval.
+# Контракт: .spec/contracts/ — Triton metrics :8002 (/metrics),
 # в compose-сети triton-net хост называется "triton"; среда CPU-only (GPU/DCGM не обещаны).
-# alerts.yml монтируется в контейнер Prometheus W-2 (deployment/docker-compose.yml)
+# alerts.yml монтируется в контейнер Prometheus (deployment/docker-compose.yml)
 # по пути /etc/prometheus/alerts.yml — интеграционная точка стыковки (H-канал, этап 7).
 
 global:

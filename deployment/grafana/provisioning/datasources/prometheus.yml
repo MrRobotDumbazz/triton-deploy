@@ -1,4 +1,4 @@
-# Grafana provisioning: источник данных Prometheus (зона deployment/, W-2).
+# Grafana provisioning: источник данных Prometheus.
 # Prometheus доступен по имени сервиса внутри сети triton-net.
 apiVersion: 1
 

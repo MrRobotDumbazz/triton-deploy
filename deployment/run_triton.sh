@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Управление стеком triton-deploy (зона deployment/, W-2).
-# Стек: triton (CPU, бэкенд onnxruntime — GPU/TensorRT не применяются, I54)
+# Управление стеком triton-deploy.
+# Стек: triton (CPU, бэкенд onnxruntime — GPU/TensorRT не применяются)
 #       + prometheus + grafana. См. deployment/docker-compose.yml.
 #
 # Использование:
@@ -16,7 +16,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"; then
     cd "$REPO_ROOT"
 else
-    # Фолбэк (громко, I54): вне git-клона предполагаем штатную раскладку ../
+    # Фолбэк (громко): вне git-клона предполагаем штатную раскладку ../
     echo "ВНИМАНИЕ: git-репозиторий не обнаружен — перехожу в '${SCRIPT_DIR}/..' как в корень проекта." >&2
     cd "${SCRIPT_DIR}/.."
 fi
@@ -49,8 +49,8 @@ wait_triton_ready() {
         fi
         sleep 2
     done
-    # Громкий фолбэк (I54): не молчим — показываем хвост логов и что делать.
-    echo "ОШИБКА (I54): Triton не стал готов за 120s." >&2
+    # Громкий фолбэк (): не молчим — показываем хвост логов и что делать.
+    echo "ОШИБКА (): Triton не стал готов за 120s." >&2
     compose logs --tail=50 triton >&2 || true
     die "Посмотрите логи целиком: bash deployment/run_triton.sh --logs"
 }
@@ -68,7 +68,7 @@ cmd_up() {
     if curl -s -X POST http://localhost:8000/v2/repository/index | python3 -m json.tool; then
         :
     else
-        echo "ВНИМАНИЕ (I54): список моделей получить не удалось — сервер не ответил на /v2/repository/index." >&2
+        echo "ВНИМАНИЕ (): список моделей получить не удалось — сервер не ответил на /v2/repository/index." >&2
     fi
     echo
     cat <<'HINTS'
