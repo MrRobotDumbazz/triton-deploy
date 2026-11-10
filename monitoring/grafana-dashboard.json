@@ -105,7 +105,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (model) (rate(nv_inference_request_success_sum[1m]))",
+          "expr": "sum by (model) (rate(nv_inference_request_success[1m]))",
           "instant": false,
           "legendFormat": "{{model}}",
           "range": true,
@@ -197,7 +197,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "1000 * sum by (model) (rate(nv_inference_request_duration_us_sum[1m]) / rate(nv_inference_request_duration_us_count[1m]))",
+          "expr": "1000 * sum by (model) (rate(nv_inference_request_duration_us[1m])) / sum by (model) (rate(nv_inference_request_success[1m]))",
           "instant": false,
           "legendFormat": "{{model}}",
           "range": true,
@@ -289,7 +289,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "1000 * sum by (model) (rate(nv_inference_compute_infer_duration_us_sum[1m]) / rate(nv_inference_compute_infer_duration_us_count[1m]))",
+          "expr": "1000 * sum by (model) (rate(nv_inference_compute_infer_duration_us[1m])) / sum by (model) (rate(nv_inference_request_success[1m]))",
           "instant": false,
           "legendFormat": "{{model}} (infer)",
           "range": true,
@@ -301,7 +301,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "1000 * sum by (model) (rate(nv_inference_queue_duration_us_sum[1m]) / rate(nv_inference_queue_duration_us_count[1m]))",
+          "expr": "1000 * sum by (model) (rate(nv_inference_queue_duration_us[1m])) / sum by (model) (rate(nv_inference_request_success[1m]))",
           "instant": false,
           "legendFormat": "{{model}} (queue)",
           "range": true,
@@ -393,7 +393,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (model) (rate(nv_inference_request_failure_sum[5m]))",
+          "expr": "sum by (model) (rate(nv_inference_request_failure[5m]))",
           "instant": false,
           "legendFormat": "{{model}}",
           "range": true,
@@ -461,7 +461,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "count(count by (model) (rate(nv_inference_request_success_sum[5m]) > 0))",
+          "expr": "count(count by (model) (rate(nv_inference_request_success[5m]) > 0))",
           "instant": true,
           "legendFormat": "active models",
           "range": false,
@@ -553,7 +553,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(nv_inference_request_success_sum[1m]))",
+          "expr": "sum(rate(nv_inference_request_success[1m]))",
           "instant": false,
           "legendFormat": "success",
           "range": true,
@@ -565,7 +565,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(nv_inference_request_failure_sum[1m]))",
+          "expr": "sum(rate(nv_inference_request_failure[1m]))",
           "instant": false,
           "legendFormat": "failure",
           "range": true,
