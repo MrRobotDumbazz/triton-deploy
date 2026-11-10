@@ -1,7 +1,7 @@
-# Стек triton-deploy: triton + prometheus + grafana (зона deployment/, W-2).
+# Стек triton-deploy: triton + prometheus + grafana.
 # Запуск: bash deployment/run_triton.sh  (или docker compose -f deployment/docker-compose.yml up -d)
 # Пути томов относительны этому файлу (deployment/): ../ — корень репо.
-# CPU-only (I54): GPU-ускорители не требуются и не обещаются; бэкенд Triton — onnxruntime.
+# CPU-only (): GPU-ускорители не требуются и не обещаются; бэкенд Triton — onnxruntime.
 
 services:
   triton:

@@ -12,7 +12,7 @@
 PIL+numpy, NMS — numpy.
 
 Функции препроцессинга/постпроцессинга переиспользуются бенчмарком
-(``client/benchmark.py``). Молчаливых фолбэков нет (I54): любая деградация
+(``client/benchmark.py``). Молчаливых фолбэков нет (): любая деградация
 печатается в stderr.
 
 CSV-лог (бонус): ``timestamp_utc,model,version,image,batch,latency_ms,ok,
@@ -186,7 +186,7 @@ def postprocess_resnet50(
         float32 [N,1000] (softmax) или [1000].
     preds:
         int64 [N,1] — argmax-индекс от модели (сверяется с probs, расхождение
-        печатается в stderr — I54, без молчаливых фолбэков).
+        печатается в stderr —, без молчаливых фолбэков).
     labels:
         1000 имён классов.
     k:
@@ -322,7 +322,7 @@ def _nms_per_class(
 
 def make_client(url: str) -> httpclient.InferenceServerClient:
     """Создать HTTP-клиент Triton (таймауты — чтобы отказ соединения
-    не висел «вечно», а падал быстро и громко, I54)."""
+    не висел «вечно», а падал быстро и громко)."""
     return httpclient.InferenceServerClient(
         url=url, verbose=False, connection_timeout=5.0, network_timeout=60.0
     )

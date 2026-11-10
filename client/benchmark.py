@@ -9,7 +9,7 @@ request по клиентским часам и throughput; результаты
 импортируются из ``inference_client`` — код не дублируется.
 
 Если сервер недоступен — громкая ошибка и выход без записи файлов
-(никаких выдуманных чисел, E8/П5; I54).
+(никаких выдуманных чисел, ).
 """
 from __future__ import annotations
 
@@ -194,7 +194,7 @@ def write_markdown(path: Path, meta: dict, results: list[dict]) -> None:
     lines.append("")
     errors = [r for r in results if r["status"] != "ok"]
     if errors:
-        lines.append("## Ошибки прогонов (I54, громко)")
+        lines.append("## Ошибки прогонов (громко)")
         for r in errors:
             lines.append(f"- {r['model']} v{r['version']} batch={r['batch']}: "
                          f"{r['error']}")

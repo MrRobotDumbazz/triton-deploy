@@ -1,5 +1,5 @@
-# Triton Inference Server — образ для triton-deploy (зона deployment/, W-2).
-# ВАЖНО (I54, громко): среда разработки CPU-only. Бэкенд моделей — onnxruntime;
+# Triton Inference Server — образ для triton-deploy.
+# ВАЖНО (громко): среда разработки CPU-only. Бэкенд моделей — onnxruntime;
 # TensorRT НЕ применяется (требует NVIDIA GPU) и здесь не обещается.
 FROM nvcr.io/nvidia/tritonserver:23.12-py3
 

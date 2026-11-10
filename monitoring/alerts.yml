@@ -1,6 +1,6 @@
-# Alerting rules Prometheus — зона: monitoring/ (W-3). Контракт: .spec/contracts/ports.md v1.0.
+# Alerting rules Prometheus Контракт: .spec/contracts/
 # Монтируется в контейнер Prometheus как /etc/prometheus/alerts.yml
-# (путь объявлен в monitoring/prometheus.yml; монтирование — зона W-2, deployment/docker-compose.yml).
+# (путь объявлен в monitoring/prometheus.yml; монтирование — deployment/docker-compose.yml).
 #
 # E8 (сверка обязательна): имена метрик Triton зависят от версии образа
 # (23.12 — канонические *_sum/_count), сверка по живому /metrics на интеграции ОБЯЗАТЕЛЬНА.
@@ -9,7 +9,7 @@
 # СВЕРЕНО с живым /metrics (Triton 23.12): success/failure и *_duration_us — простые counters (не гистограммы);
 # средняя задержка = rate(duration) / rate(success), мкс → порог 100000 = 100 мс
 # (панели 1, 4, 5, 6). Гистограммные семейства (*_duration_us) суффиксы имеют.
-# Среда CPU-only (ports.md, I54 громко): GPU/DCGM-метрики не обещаны и здесь не используются.
+# Среда CPU-only (ports.md громко): GPU/DCGM-метрики не обещаны и здесь не используются.
 
 groups:
   - name: triton-alerts
