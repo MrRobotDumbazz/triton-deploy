@@ -12,7 +12,7 @@ git checkout -q -B "$BRANCH" "origin/$BASE"
 GOV=".ztacp .agents .plan .spec AGENTS.md docs/ztacp-pattern.md docs/ztacp-pattern.en.md docs/ztacp-agents-school.md"
 FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --prune-empty \
   --index-filter "git rm -rq --cached --ignore-unmatch $GOV" \
-  --msg-filter 'sed -E -e "s/[Zz][Tt][Aa][Cc][Pp]//g" -e "s/\((I[0-9]+(, ?I[0-9]+)*)\)//g" -e "s/\(6\.[0-9.]+\)//g" -e "s/(^|[^A-Za-z0-9])I[0-9]{1,2}([^0-9]|$)/\1\2/g" -e "s/  +/ /g"' \
+  --msg-filter 'sed -E -e "s/[Zz][Tt][Aa][Cc][Pp]//g" -e "s/\((I[0-9]+(, ?I[0-9]+)*)\)//g" -e "s/\(6\.[0-9.]+\)//g" -e "s/(^|[^A-Za-z0-9])I[0-9]{1,2}([^0-9]|$)/\1\2/g" -e "s/^genesis:.*$/init: стартовая структура репозитория/" -e "s/^plan:.*$/chore: gitignore/" -e "s/^audit:.*$/chore: финальная сверка/" -e "s/^(w[1-9]|w[1-9]\+интеграция|интеграция)\(([a-z]+)\): /\2: /" -e "s/[ (]?контракт [a-z0-9.-]*( v?[0-9.]+)?//g" -e "s/  +/ /g"' \
   -- HEAD >/dev/null
 # .gitignore в main несёт governance-исключения (!.ztacp/*.log) — в submit заменяем
 # продуктовым вариантом одним органичным коммитом (дерево ветки чистое по скану).
