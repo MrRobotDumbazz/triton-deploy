@@ -14,6 +14,30 @@ FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --prune-empty \
   --index-filter "git rm -rq --cached --ignore-unmatch $GOV" \
   --msg-filter 'sed -E -e "s/[Zz][Tt][Aa][Cc][Pp]//g" -e "s/\((I[0-9]+(, ?I[0-9]+)*)\)//g" -e "s/\(6\.[0-9.]+\)//g" -e "s/(^|[^A-Za-z0-9])I[0-9]{1,2}([^0-9]|$)/\1\2/g" -e "s/  +/ /g"' \
   -- HEAD >/dev/null
+# .gitignore в main несёт governance-исключения (!.ztacp/*.log) — в submit заменяем
+# продуктовым вариантом одним органичным коммитом (дерево ветки чистое по скану).
+cat > .gitignore <<'GITIGNORE'
+# Python
+__pycache__/
+*.py[cod]
+.venv*/
+venv/
+
+# Runtime-артефакты клиента (лог инференса — вывод, не код)
+client/inference_log.csv
+client/inference_log_*.csv
+
+# Секреты
+.env
+
+# Служебное
+.DS_Store
+*.log
+GITIGNORE
+git add .gitignore
+git -c user.name="$(git log -1 --format=%an)" -c user.email="$(git log -1 --format=%ae)" \
+  commit -q -m "chore: gitignore под релиз" || true
+
 HITS=$(git grep -Iil -e 'ZTACP' -e '\.ztacp' . 2>/dev/null || true)
 [ -n "$HITS" ] && { echo "FAIL: $HITS"; exit 1; }
 cd "$ROOT"; git fetch -q "$TMP/clone" "+refs/heads/$BRANCH:refs/heads/$BRANCH"
